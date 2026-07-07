@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111513">
+  <title>Shot Timer</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">ST</span>
+        <div>
+          <h1>Shot Timer</h1>
+          <p id="statusText">Prêt</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="badge" id="secureBadge">HTTPS</span>
+        <button class="icon-button" id="themeBtn" type="button" title="Thème" aria-label="Changer le thème">
+          <svg viewBox="0 0 24 24"><path d="M12 3a6.5 6.5 0 0 0 9 7.5A9 9 0 1 1 12 3Z"></path></svg>
+        </button>
+        <button class="icon-button" id="soundBtn" type="button" title="Son" aria-label="Activer ou couper le son">
+          <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <section class="panel timer-panel">
+        <div class="timer-face" id="timerFace">
+          <div class="timer-inner">
+            <span class="mode-pill" id="runState">Standby</span>
+            <output class="timer-value" id="timerValue">0.00</output>
+            <div class="timer-meta">
+              <span><b id="shotCount">0</b> tirs</span>
+              <span>split <b id="lastSplit">--</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="button primary" id="startBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"></path></svg>
+            Start
+          </button>
+          <button class="button danger" id="stopBtn" type="button" disabled>
+            <svg viewBox="0 0 24 24"><path d="M7 7h10v10H7z"></path></svg>
+            Stop
+          </button>
+          <button class="button" id="resetBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+            Reset
+          </button>
+          <button class="button" id="manualBtn" type="button" disabled>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M2 12h4"></path><path d="M18 12h4"></path></svg>
+            Tir
+          </button>
+        </div>
+
+        <div class="stats">
+          <article><span>Premier</span><strong id="firstShot">--</strong></article>
+          <article><span>Meilleur</span><strong id="bestSplit">--</strong></article>
+          <article><span>Moyenne</span><strong id="avgSplit">--</strong></article>
+          <article><span>Par</span><strong id="parResult">--</strong></article>
+        </div>
+      </section>
+
+      <section class="panel settings-panel">
+        <div class="panel-head">
+          <h2>Réglages</h2>
+          <span class="badge" id="micBadge">Micro off</span>
+        </div>
+
+        <div class="mode-tabs" role="tablist" aria-label="Mode">
+          <button class="active" type="button" data-mode="standard">Standard</button>
+          <button type="button" data-mode="par">Par</button>
+          <button type="button" data-mode="dry">Dry</button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Départ
+            <select id="delayMode">
+              <option value="fixed">Fixe</option>
+              <option value="random">Aléatoire</option>
+            </select>
+          </label>
+          <label>
+            Min
+            <input id="delayMin" type="number" min="0" max="20" step="0.1" value="1.0">
+          </label>
+          <label>
+            Max
+            <input id="delayMax" type="number" min="0" max="20" step="0.1" value="3.0">
+          </label>
+          <label>
+            Par
+            <input id="parTime" type="number" min="0.2" max="60" step="0.1" value="3.0">
+          </label>
+          <label>
+            Lockout
+            <input id="lockout" type="number" min="0.03" max="1.5" step="0.01" value="0.08">
+          </label>
+          <label>
+            Volume
+            <input id="volume" type="number" min="0" max="100" step="5" value="80">
+          </label>
+        </div>
+
+        <div class="mic-card">
+          <div class="mic-actions">
+            <button class="button" id="micBtn" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg>
+              Micro
+            </button>
+            <button class="button" id="calibrateBtn" type="button" disabled>
+              <svg viewBox="0 0 24 24"><path d="M4 21v-7"></path><path d="M4 10V3"></path><path d="M12 21v-9"></path><path d="M12 8V3"></path><path d="M20 21v-5"></path><path d="M20 12V3"></path><path d="M2 14h4"></path><path d="M10 8h4"></path><path d="M18 16h4"></path></svg>
+              Calibrer
+            </button>
+            <span class="badge" id="levelText">0 / 10%</span>
+          </div>
+
+          <label class="range-label">
+            Seuil
+            <input id="threshold" type="range" min="2" max="70" value="10">
+          </label>
+          <div class="meter" id="meter">
+            <span id="meterFill"></span>
+            <i id="meterNeedle"></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel shots-panel">
+        <div class="panel-head">
+          <h2>Tirs</h2>
+          <button class="button compact" id="saveBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>
+            Save
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Temps</th>
+                <th>Split</th>
+                <th>Signal</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody id="shotsBody"></tbody>
+          </table>
+          <p class="empty" id="shotsEmpty">Aucun tir.</p>
+        </div>
+      </section>
+
+      <section class="panel history-panel">
+        <div class="panel-head">
+          <h2>Historique</h2>
+          <div class="row">
+            <button class="icon-button" id="exportBtn" type="button" title="CSV" aria-label="Exporter CSV">
+              <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+            </button>
+            <button class="icon-button" id="clearBtn" type="button" title="Effacer" aria-label="Effacer l’historique">
+              <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="m19 6-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>
+            </button>
+          </div>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
